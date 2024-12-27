@@ -77,11 +77,53 @@ const gameContent = {
                 }
             ]
         },
+        sharing: {
+            text: "Your willingness to share breakthroughs helps rebuild trust with the international community.",
+            options: [
+                {
+                    text: "Form international partnerships",
+                    nextScene: "success",
+                    effect: {
+                        influence: 10,
+                        trust: 10
+                    }
+                },
+                {
+                    text: "Keep control over implementation",
+                    nextScene: "compromise",
+                    effect: {
+                        innovation: 5,
+                        trust: -5
+                    }
+                }
+            ]
+        },
+        independent: {
+            text: "Your nation makes rapid progress in AI development, but international isolation grows.",
+            options: [
+                {
+                    text: "Begin diplomatic outreach",
+                    nextScene: "compromise",
+                    effect: {
+                        influence: 5,
+                        trust: 5
+                    }
+                },
+                {
+                    text: "Double down on independence",
+                    nextScene: "ending_negative",
+                    effect: {
+                        innovation: 10,
+                        trust: -10
+                    }
+                }
+            ]
+        },
         democratic: {
             text: "Your democratic approach gains widespread support, though progress is slower.",
             options: [
                 {
-                    text: "Maintain the course",
+                    text: "Maintain the inclusive approach",
                     nextScene: "success",
                     effect: {
                         trust: 15,
@@ -89,7 +131,7 @@ const gameContent = {
                     }
                 },
                 {
-                    text: "Streamline the process",
+                    text: "Streamline decision-making",
                     nextScene: "compromise",
                     effect: {
                         innovation: 10,
@@ -124,26 +166,39 @@ const gameContent = {
             options: [
                 {
                     text: "Start New Game",
-                    nextScene: "intro"
+                    nextScene: "intro",
+                    effect: null
                 }
-            ]
+            ],
+            final: true
         },
         compromise: {
             text: "You find a workable balance, though some opportunities are missed.",
             options: [
                 {
                     text: "Start New Game",
-                    nextScene: "intro"
+                    nextScene: "intro",
+                    effect: null
                 }
-            ]
+            ],
+            final: true
+        },
+        ending_negative: {
+            text: "Your choices led to technological advancement but at the cost of global cooperation.",
+            options: [
+                {
+                    text: "Start New Game",
+                    nextScene: "intro",
+                    effect: null
+                }
+            ],
+            final: true
         }
     }
 };
 
-// Game Manager Class
 class GameManager {
     constructor() {
-        // DOM Elements
         this.elements = {
             startScreen: document.getElementById('start-screen'),
             startButton: document.getElementById('start-button'),
@@ -195,6 +250,8 @@ class GameManager {
     }
 
     handleOption(option) {
+        const currentScene = gameContent.scenes[gameState.currentScene];
+
         // Update stats based on choice
         if (option.effect) {
             Object.entries(option.effect).forEach(([stat, change]) => {
@@ -204,13 +261,20 @@ class GameManager {
         }
 
         // Update game state
-        if (option.nextScene !== 'intro') {
+        if (!currentScene.final) {
             gameState.actions--;
             gameState.year++;
         }
-        gameState.currentScene = option.nextScene;
 
-        if (option.nextScene === 'intro') {
+        // Check if we should move to a negative ending
+        if (gameState.actions <= 0 && !gameContent.scenes[option.nextScene].final) {
+            gameState.currentScene = 'ending_negative';
+        } else {
+            gameState.currentScene = option.nextScene;
+        }
+
+        // Handle starting a new game
+        if (gameState.currentScene === 'intro') {
             this.startGame();
         } else {
             this.loadScene();
@@ -228,14 +292,21 @@ class GameManager {
     loadScene() {
         const scene = gameContent.scenes[gameState.currentScene];
         
+        if (!scene) {
+            console.error('Scene not found:', gameState.currentScene);
+            return;
+        }
+
         // Update story
         this.elements.story.textContent = scene.text;
         
         // Update options
         this.elements.options.innerHTML = '';
-        scene.options?.forEach(option => {
-            this.elements.options.appendChild(this.createOptionButton(option));
-        });
+        if (scene.options) {
+            scene.options.forEach(option => {
+                this.elements.options.appendChild(this.createOptionButton(option));
+            });
+        }
 
         // Update UI
         this.updateStats();
@@ -270,4 +341,3 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Failed to initialize game:', error);
     }
 });
-
