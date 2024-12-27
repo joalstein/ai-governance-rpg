@@ -1,224 +1,273 @@
-// Enhanced game state with more dynamic elements
-const gameData = {
+// Game State
+const gameState = {
     currentScene: 'intro',
     actions: 10,
-    worldState: {
-        year: 2024,
-        crisisLevel: 0,
-        aiProgress: 0
-    },
-    framework: {
-        governance: [],    // Collected governance principles
-        infrastructure: [] // Built technical infrastructure
-    },
-    relationships: {       // Dynamic relationship tracking
-        international: new Map(),
-        corporate: new Map(),
-        public: new Map()
-    },
+    year: 2024,
     playerStats: {
         influence: 50,
         trust: 50,
         innovation: 50,
         sustainability: 50
-    },
-    history: [],          // Track previous decisions
-    achievements: new Set(),
-    
-    // Enhanced game mechanics
-    mechanics: {
-        // Crisis event system
-        crisisEvents: {
-            aiAccident: {
-                trigger: (state) => state.aiProgress > 70 && state.worldState.crisisLevel < 3,
-                effect: (state) => {
-                    state.worldState.crisisLevel++;
-                    return "An AI system malfunction has caused public concern...";
-                }
-            },
-            publicBacklash: {
-                trigger: (state) => state.playerStats.trust < 30,
-                effect: (state) => {
-                    state.playerStats.influence -= 10;
-                    return "Public protests against AI development are growing...";
-                }
-            }
-        },
-
-        // Relationship system
-        updateRelationships(decision) {
-            this.relationships.forEach((value, key) => {
-                value.trust += decision.effects[key] || 0;
-                value.alignment += decision.effects.alignment || 0;
-            });
-        },
-
-        // Framework building system
-        addToFramework(component) {
-            if (component.type === 'governance') {
-                this.framework.governance.push(component);
-            } else {
-                this.framework.infrastructure.push(component);
-            }
-        }
-    },
-
-    scenes: {
-        intro: {
-            story: (state) => `Year ${state.worldState.year}: As AI capabilities advance rapidly, you must shape its trajectory. Your previous decisions have ${
-                state.history.length > 0 ? 'led to ' + summarizeImpacts(state.history) : 'yet to make their mark'
-            }.`,
-            options: [
-                {
-                    text: "Propose a new AI governance framework",
-                    nextScene: (state) => state.playerStats.influence > 60 ? 'framework_strong' : 'framework_weak',
-                    effects: {
-                        influence: +5,
-                        trust: +10
-                    },
-                    requires: null,
-                    consequences: {
-                        immediate: "Other nations show interest in your proposal",
-                        longTerm: (state) => {
-                            state.framework.governance.push('Constitutional AI Principles');
-                            return "Your framework becomes a foundation for future decisions";
-                        }
-                    }
-                },
-                {
-                    text: "Focus on technical infrastructure first",
-                    nextScene: 'technical_path',
-                    effects: {
-                        innovation: +15,
-                        sustainability: -5
-                    },
-                    consequences: {
-                        immediate: "Development accelerates but raises concerns",
-                        longTerm: (state) => {
-                            state.aiProgress += 20;
-                            return "Your technical foundation shapes future possibilities";
-                        }
-                    }
-                }
-            ]
-        },
-        
-        framework_strong: {
-            story: (state) => {
-                const pastChoices = analyzePastChoices(state.history);
-                return `Your strong international influence helps your framework gain traction. ${
-                    pastChoices.includes('technical') ? 
-                    'Your technical expertise adds credibility.' : 
-                    'Some question the technical feasibility.'
-                }`;
-            },
-            options: [
-                {
-                    text: "Push for immediate adoption",
-                    consequence: (state) => {
-                        if (state.relationships.international.get('trust') > 70) {
-                            return "success_rapid";
-                        }
-                        return "resistance_strong";
-                    }
-                },
-                {
-                    text: "Build consensus gradually",
-                    consequence: (state) => {
-                        state.framework.governance.push('Collaborative Decision Protocol');
-                        return "consensus_path";
-                    }
-                }
-            ]
-        }
-        // Additional scenes following similar pattern...
     }
 };
 
-// Enhanced game mechanics
-class GameMechanics {
-    constructor(gameState) {
-        this.state = gameState;
-        this.eventSystem = new EventSystem();
-        this.relationshipManager = new RelationshipManager();
+// Game Content
+const gameContent = {
+    scenes: {
+        intro: {
+            text: "As a newly appointed AI Governance Architect, you stand at the crossroads of humanity's future. Your decisions will shape how AI development proceeds globally.",
+            options: [
+                {
+                    text: "Prioritize international cooperation",
+                    nextScene: "cooperation",
+                    effect: {
+                        influence: 10,
+                        trust: 5
+                    }
+                },
+                {
+                    text: "Focus on national development",
+                    nextScene: "national",
+                    effect: {
+                        innovation: 15,
+                        trust: -5
+                    }
+                }
+            ]
+        },
+        cooperation: {
+            text: "You choose to emphasize international cooperation. Other nations show interest in your approach, but coordination challenges emerge.",
+            options: [
+                {
+                    text: "Create a democratic framework",
+                    nextScene: "democratic",
+                    effect: {
+                        trust: 10,
+                        influence: 5
+                    }
+                },
+                {
+                    text: "Establish an expert council",
+                    nextScene: "expert",
+                    effect: {
+                        innovation: 10,
+                        trust: -5
+                    }
+                }
+            ]
+        },
+        national: {
+            text: "Your focus on national interests accelerates development but raises international concerns.",
+            options: [
+                {
+                    text: "Share selected breakthroughs",
+                    nextScene: "sharing",
+                    effect: {
+                        trust: 5,
+                        innovation: -5
+                    }
+                },
+                {
+                    text: "Maintain independence",
+                    nextScene: "independent",
+                    effect: {
+                        innovation: 15,
+                        influence: -10
+                    }
+                }
+            ]
+        },
+        democratic: {
+            text: "Your democratic approach gains widespread support, though progress is slower.",
+            options: [
+                {
+                    text: "Maintain the course",
+                    nextScene: "success",
+                    effect: {
+                        trust: 15,
+                        innovation: -5
+                    }
+                },
+                {
+                    text: "Streamline the process",
+                    nextScene: "compromise",
+                    effect: {
+                        innovation: 10,
+                        trust: -5
+                    }
+                }
+            ]
+        },
+        expert: {
+            text: "The expert council makes rapid progress but faces public scrutiny.",
+            options: [
+                {
+                    text: "Address public concerns",
+                    nextScene: "success",
+                    effect: {
+                        trust: 10,
+                        innovation: -5
+                    }
+                },
+                {
+                    text: "Maintain focus on progress",
+                    nextScene: "compromise",
+                    effect: {
+                        innovation: 15,
+                        trust: -10
+                    }
+                }
+            ]
+        },
+        success: {
+            text: "Your balanced approach leads to sustainable progress. The future looks promising.",
+            options: [
+                {
+                    text: "Start New Game",
+                    nextScene: "intro"
+                }
+            ]
+        },
+        compromise: {
+            text: "You find a workable balance, though some opportunities are missed.",
+            options: [
+                {
+                    text: "Start New Game",
+                    nextScene: "intro"
+                }
+            ]
+        }
+    }
+};
+
+// Game Manager Class
+class GameManager {
+    constructor() {
+        // DOM Elements
+        this.elements = {
+            startScreen: document.getElementById('start-screen'),
+            startButton: document.getElementById('start-button'),
+            story: document.getElementById('story'),
+            options: document.getElementById('options'),
+            stats: document.getElementById('stats'),
+            year: document.getElementById('year'),
+            actions: document.getElementById('actions')
+        };
+
+        // Verify all elements exist
+        const missingElements = Object.entries(this.elements)
+            .filter(([key, element]) => !element)
+            .map(([key]) => key);
+
+        if (missingElements.length > 0) {
+            console.error('Missing DOM elements:', missingElements);
+            throw new Error('Required DOM elements not found');
+        }
+
+        // Bind methods
+        this.startGame = this.startGame.bind(this);
+        this.handleOption = this.handleOption.bind(this);
+        this.loadScene = this.loadScene.bind(this);
+
+        // Initialize event listeners
+        this.elements.startButton.addEventListener('click', this.startGame);
     }
 
-    processDecision(decision) {
-        // Update basic stats
-        this.state.updateStats(decision.effects);
+    updateStats() {
+        this.elements.stats.innerHTML = '';
+        Object.entries(gameState.playerStats).forEach(([stat, value]) => {
+            const statItem = document.createElement('div');
+            statItem.className = 'stat-item';
+            statItem.innerHTML = `
+                <div class="stat-label">${stat.charAt(0).toUpperCase() + stat.slice(1)}</div>
+                <div class="stat-bar">
+                    <div class="stat-progress" style="width: ${value}%"></div>
+                </div>
+                <div class="stat-value">${value}%</div>
+            `;
+            this.elements.stats.appendChild(statItem);
+        });
+    }
+
+    updateWorld() {
+        this.elements.year.textContent = `Year: ${gameState.year}`;
+        this.elements.actions.textContent = `Actions: ${gameState.actions}`;
+    }
+
+    handleOption(option) {
+        // Update stats based on choice
+        if (option.effect) {
+            Object.entries(option.effect).forEach(([stat, change]) => {
+                gameState.playerStats[stat] = Math.max(0, Math.min(100, 
+                    gameState.playerStats[stat] + change));
+            });
+        }
+
+        // Update game state
+        if (option.nextScene !== 'intro') {
+            gameState.actions--;
+            gameState.year++;
+        }
+        gameState.currentScene = option.nextScene;
+
+        if (option.nextScene === 'intro') {
+            this.startGame();
+        } else {
+            this.loadScene();
+        }
+    }
+
+    createOptionButton(option) {
+        const button = document.createElement('button');
+        button.className = 'option-button';
+        button.textContent = option.text;
+        button.onclick = () => this.handleOption(option);
+        return button;
+    }
+
+    loadScene() {
+        const scene = gameContent.scenes[gameState.currentScene];
         
-        // Process deeper consequences
-        if (decision.consequences) {
-            this.processConsequences(decision.consequences);
-        }
-
-        // Check for and trigger events
-        this.eventSystem.checkEvents(this.state);
-
-        // Update relationships
-        this.relationshipManager.updateRelationships(decision);
-
-        // Add to history
-        this.state.history.push({
-            decision: decision,
-            worldState: {...this.state.worldState},
-            timestamp: new Date()
+        // Update story
+        this.elements.story.textContent = scene.text;
+        
+        // Update options
+        this.elements.options.innerHTML = '';
+        scene.options?.forEach(option => {
+            this.elements.options.appendChild(this.createOptionButton(option));
         });
+
+        // Update UI
+        this.updateStats();
+        this.updateWorld();
     }
 
-    processConsequences(consequences) {
-        const immediate = consequences.immediate(this.state);
-        this.eventSystem.queueEvent(immediate);
+    startGame() {
+        // Reset game state
+        gameState.currentScene = 'intro';
+        gameState.actions = 10;
+        gameState.year = 2024;
+        gameState.playerStats = {
+            influence: 50,
+            trust: 50,
+            innovation: 50,
+            sustainability: 50
+        };
 
-        if (consequences.longTerm) {
-            this.eventSystem.scheduleFutureEvent(consequences.longTerm, 2);
-        }
+        // Hide start screen
+        this.elements.startScreen.classList.add('hidden');
+        
+        // Load first scene
+        this.loadScene();
     }
 }
 
-class EventSystem {
-    constructor() {
-        this.eventQueue = [];
-        this.scheduledEvents = [];
+// Initialize game when DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        window.game = new GameManager();
+    } catch (error) {
+        console.error('Failed to initialize game:', error);
     }
+});
 
-    checkEvents(gameState) {
-        Object.values(gameState.mechanics.crisisEvents).forEach(event => {
-            if (event.trigger(gameState)) {
-                this.queueEvent(event.effect(gameState));
-            }
-        });
-    }
-
-    queueEvent(event) {
-        this.eventQueue.push(event);
-    }
-
-    scheduleFutureEvent(event, turnsLater) {
-        this.scheduledEvents.push({event, triggersIn: turnsLater});
-    }
-}
-
-class RelationshipManager {
-    constructor() {
-        this.relationships = new Map();
-    }
-
-    updateRelationships(decision) {
-        this.relationships.forEach((relationship, entity) => {
-            if (decision.effects[entity]) {
-                relationship.trust += decision.effects[entity].trust || 0;
-                relationship.alignment += decision.effects[entity].alignment || 0;
-                this.checkRelationshipThresholds(entity, relationship);
-            }
-        });
-    }
-
-    checkRelationshipThresholds(entity, relationship) {
-        if (relationship.trust < 20) {
-            this.triggerRelationshipCrisis(entity);
-        } else if (relationship.trust > 80) {
-            this.unlockNewOpportunities(entity);
-        }
-    }
-}
