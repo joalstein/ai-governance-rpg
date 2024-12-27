@@ -1,0 +1,147 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Governance RPG</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Game Header -->
+        <header class="game-header">
+            <h1>AI Governance: Shape the Future</h1>
+            <div id="world-state" class="world-info">
+                <span id="year">Year: 2024</span>
+                <span id="crisis-level">Crisis Level: 0</span>
+                <span id="ai-progress">AI Progress: 0%</span>
+            </div>
+        </header>
+
+        <!-- Main Game Area -->
+        <main class="game-main">
+            <!-- Introduction Screen -->
+            <div id="intro-screen" class="game-screen">
+                <div class="intro-content">
+                    <h2>Welcome, Future Architect</h2>
+                    <p class="intro-text">
+                        Shape the future of AI governance through your decisions. 
+                        Build frameworks, manage relationships, and navigate crises.
+                    </p>
+                    <button id="startBtn" class="primary-button">Begin Your Journey</button>
+                </div>
+            </div>
+
+            <!-- Game Content -->
+            <div id="game-content" class="game-screen hidden">
+                <!-- Stats Panel -->
+                <div class="side-panel left-panel">
+                    <div id="stats-display" class="stats-container">
+                        <h3>Your Influence</h3>
+                        <!-- Stats will be inserted here -->
+                    </div>
+                    
+                    <div id="relationships" class="relationships-container">
+                        <h3>Relationships</h3>
+                        <div id="relationship-stats">
+                            <!-- Relationship stats will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Central Game Area -->
+                <div class="central-area">
+                    <!-- Event Notifications -->
+                    <div id="event-log" class="event-container">
+                        <!-- Events will appear here -->
+                    </div>
+
+                    <!-- Main Story -->
+                    <div class="story-container">
+                        <div id="story" class="story-text">
+                            <!-- Story text goes here -->
+                        </div>
+                        <div id="options" class="options-container">
+                            <!-- Options will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Action Counter -->
+                    <div id="actions" class="action-counter">
+                        Actions Remaining: 10
+                    </div>
+                </div>
+
+                <!-- Framework Panel -->
+                <div class="side-panel right-panel">
+                    <div id="framework" class="framework-container">
+                        <h3>Your Framework</h3>
+                        <div class="framework-section">
+                            <h4>Governance Principles</h4>
+                            <ul id="governance-list">
+                                <!-- Governance items will be listed here -->
+                            </ul>
+                        </div>
+                        <div class="framework-section">
+                            <h4>Infrastructure</h4>
+                            <ul id="infrastructure-list">
+                                <!-- Infrastructure items will be listed here -->
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="achievements" class="achievements-container">
+                        <h3>Achievements</h3>
+                        <div id="achievement-list">
+                            <!-- Achievements will be listed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Crisis Event Modal -->
+            <div id="crisis-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h2>Crisis Event!</h2>
+                    <p id="crisis-description"></p>
+                    <div id="crisis-options"></div>
+                </div>
+            </div>
+
+            <!-- Feedback Modal -->
+            <div id="feedback-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h2>Decision Impact</h2>
+                    <p id="immediate-feedback"></p>
+                    <div id="stat-changes"></div>
+                    <button id="acknowledge-btn" class="secondary-button">Continue</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Game Footer -->
+        <footer class="game-footer">
+            <div id="feedback" class="feedback-text"></div>
+            <div class="control-hints">
+                <span>Use arrow keys to navigate</span>
+                <span>Press Enter to select</span>
+                <span>Press ESC for menu</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Game Menu Modal -->
+    <div id="menu-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Game Menu</h2>
+            <button id="continue-btn" class="menu-button">Continue</button>
+            <button id="new-game-btn" class="menu-button">New Game</button>
+            <button id="help-btn" class="menu-button">Help</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="gameData.js"></script>
+    <script src="gameMechanics.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
