@@ -138,7 +138,7 @@ const gameContent = {
         }
     }
 };
- safety: {
+safety: {
             text: "Your commitment to safety earns public trust, but some worry about falling behind.",
             options: [
                 {
@@ -148,7 +148,7 @@ const gameContent = {
                         trust: 15,
                         sustainability: 10,
                         innovation: -10
-                    },
+                    }, // <---- Added the missing comma here!
                     consequence: "A robust safety framework emerges."
                 },
                 {
